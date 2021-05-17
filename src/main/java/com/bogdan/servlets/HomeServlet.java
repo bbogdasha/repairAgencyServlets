@@ -1,4 +1,4 @@
-package com.bogdan;
+package com.bogdan.servlets;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
