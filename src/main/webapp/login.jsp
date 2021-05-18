@@ -3,16 +3,16 @@
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title>Registration</title>
+        <title>Login</title>
     </head>
     <body>
-        <h1>Registration page:</h1>
-        <form action="register" method="post">
+        <h1>Login page:</h1>
+        <form action="login" method="post">
             <table>
-                <tr><td>User Name: </td><td><input type="text" name="uname"></td></tr>
                 <tr><td>Email: </td><td><input type="text" name="email"></td></tr>
                 <tr><td>Password: </td><td><input type="password" name="password"></td></tr>
-                <tr><td></td><td><input type="submit" value="Registration"></td></tr>
+                <tr><td>${message}</td></tr>
+                <tr><td></td><td><input type="submit" value="Log in"></td></tr>
             </table>
         </form>
     </body>

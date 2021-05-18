@@ -4,36 +4,45 @@ import com.bogdan.dao.ConnectionDB;
 import com.bogdan.dao.UserDB;
 import com.bogdan.model.User;
 
-import java.io.IOException;
-import java.sql.SQLException;
+import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import java.io.IOException;
+import java.sql.SQLException;
 
-@WebServlet("/register")
-public class RegisterServlet extends HttpServlet {
+@WebServlet("/login")
+public class LoginServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
-        String uname = request.getParameter("uname");
         String email = request.getParameter("email");
         String password = request.getParameter("password");
+        String page = "login.jsp";
 
-        User user = new User(uname, password, email);
         UserDB userDB = new UserDB(ConnectionDB.getConnection());
 
         try {
-            if (userDB.saveUser(user)) {
-                response.getWriter().print("Data entered successfully");
+            User user = userDB.logUser(email, password);
+
+            if (user != null) {
+                HttpSession session = request.getSession();
+                session.setAttribute("user", user);
+                page = "home.jsp";
             } else {
-                response.getWriter().print("Data not entered");
+                String message = "Invalid email or password!";
+                request.setAttribute("message", message);
             }
+
+            RequestDispatcher dispatcher = request.getRequestDispatcher(page);
+            dispatcher.forward(request, response);
+
         } catch (SQLException throwable) {
             throwable.printStackTrace();
         }
     }
-
 }

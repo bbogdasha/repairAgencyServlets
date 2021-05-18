@@ -1,11 +1,13 @@
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html>
     <head>
         <title>Home page</title>
     </head>
     <body>
-        <h1>Welcome, user!</h1>
-        <a href="registration.jsp">Registration page</a>
+        <h1>Hi, ${user.name}!</h1>
+        <b>Email: ${user.email}, password: ${user.password}</b>
+        <br>
+        <a href="/repair-agency/logout">Logout</a>
     </body>
 </html>
