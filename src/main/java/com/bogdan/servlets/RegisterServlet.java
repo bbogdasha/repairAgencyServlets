@@ -2,6 +2,7 @@ package com.bogdan.servlets;
 
 import com.bogdan.dao.ConnectionDB;
 import com.bogdan.dao.UserDB;
+import com.bogdan.model.Role;
 import com.bogdan.model.User;
 
 import java.io.IOException;
@@ -22,7 +23,7 @@ public class RegisterServlet extends HttpServlet {
         String email = request.getParameter("email");
         String password = request.getParameter("password");
 
-        User user = new User(uname, password, email);
+        User user = new User(Role.USER, uname, email, password);
         UserDB userDB = new UserDB(ConnectionDB.getConnection());
 
         try {

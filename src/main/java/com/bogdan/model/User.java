@@ -2,7 +2,8 @@ package com.bogdan.model;
 
 public class User {
 
-    private long id;
+    private int id;
+    private Role role;
     private String name;
     private String email;
     private String password;
@@ -10,18 +11,27 @@ public class User {
     public User() {
     }
 
-    public User(String name, String email, String password) {
+    public User(Role role, String name, String email, String password) {
+        this.role = role;
         this.name = name;
         this.email = email;
         this.password = password;
     }
 
-    public long getId() {
+    public int getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(int id) {
         this.id = id;
+    }
+
+    public Role getRole() {
+        return role;
+    }
+
+    public void setRole(Role role) {
+        this.role = role;
     }
 
     public String getName() {

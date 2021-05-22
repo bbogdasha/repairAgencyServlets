@@ -2,6 +2,7 @@ package com.bogdan.servlets;
 
 import com.bogdan.dao.ConnectionDB;
 import com.bogdan.dao.UserDB;
+import com.bogdan.model.Role;
 import com.bogdan.model.User;
 
 import javax.servlet.RequestDispatcher;
@@ -22,7 +23,9 @@ public class LoginServlet extends HttpServlet {
 
         String email = request.getParameter("email");
         String password = request.getParameter("password");
-        String page = "login.jsp";
+
+        String path = request.getContextPath();
+        String page = "/login.jsp";
 
         UserDB userDB = new UserDB(ConnectionDB.getConnection());
 
@@ -31,18 +34,20 @@ public class LoginServlet extends HttpServlet {
 
             if (user != null) {
                 HttpSession session = request.getSession();
-                session.setAttribute("user", user);
-                page = "home.jsp";
+
+                if (user.getRole().equals(Role.MANAGER) && user.getRole().equals(Role.WORKER)) {
+                    page = "/manager.jsp";
+                } else {
+                    session.setAttribute("user", user);
+                    page = "/my-orders";
+                }
             } else {
                 String message = "Invalid email or password!";
                 request.setAttribute("message", message);
             }
-
-            RequestDispatcher dispatcher = request.getRequestDispatcher(page);
-            dispatcher.forward(request, response);
-
-        } catch (SQLException throwable) {
-            throwable.printStackTrace();
+            response.sendRedirect(path + page);
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
     }
 }
