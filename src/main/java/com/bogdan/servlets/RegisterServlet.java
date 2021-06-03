@@ -24,9 +24,10 @@ public class RegisterServlet extends HttpServlet {
         String password = request.getParameter("password");
 
         User user = new User(Role.USER, uname, email, password);
-        UserDB userDB = new UserDB(ConnectionDB.getConnection());
 
         try {
+            UserDB userDB = new UserDB(ConnectionDB.getConnection());
+
             if (userDB.saveUser(user)) {
                 response.getWriter().print("Data entered successfully");
             } else {

@@ -7,17 +7,21 @@ public class Order {
     private String message;
     private User user;
     private double price;
-    private User worker;
+    private String workerName;
     private State state;
 
     public Order() {
     }
 
-    public Order(int id, String title, String message, double price) {
-        this.id = id;
+    public Order(String title, String message, User user) {
         this.title = title;
         this.message = message;
-        this.price = price;
+        this.user = user;
+    }
+
+    public Order(int id, String title) {
+        this.id = id;
+        this.title = title;
     }
 
     public int getId() {
@@ -60,12 +64,12 @@ public class Order {
         this.price = price;
     }
 
-    public User getWorker() {
-        return worker;
+    public String getWorkerName() {
+        return workerName;
     }
 
-    public void setWorker(User worker) {
-        this.worker = worker;
+    public void setWorkerName(String workerName) {
+        this.workerName = workerName;
     }
 
     public State getState() {
