@@ -15,7 +15,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 
-@WebServlet({"/list", "/list/new", "/list/insert"})
+@WebServlet({"/list", "/list/new", "/list/insert", "/list/delete"})
 public class ControllerUserServlet extends HttpServlet {
 
     private OrderDB orderDB;
@@ -27,7 +27,7 @@ public class ControllerUserServlet extends HttpServlet {
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String action = request.getServletPath();
-        System.out.println("A: " + action);
+        System.out.println("Action: " + action);
         try {
             orderDB = new OrderDB(ConnectionDB.getConnection());
             switch (action) {
@@ -37,9 +37,9 @@ public class ControllerUserServlet extends HttpServlet {
                 case "/list/insert":
                     addOrder(request, response);
                     break;
-//                case "/delete":
-//                    deleteBook(request, response);
-//                    break;
+                case "/list/delete":
+                    deleteOrder(request, response);
+                    break;
 //                case "/edit":
 //                    showEditForm(request, response);
 //                    break;
@@ -68,6 +68,8 @@ public class ControllerUserServlet extends HttpServlet {
         dispatcher.forward(request, response);
     }
 
+
+
     private void addOrder(HttpServletRequest request, HttpServletResponse response) throws SQLException, IOException {
         String title = request.getParameter("title");
         String message = request.getParameter("message");
@@ -75,5 +77,19 @@ public class ControllerUserServlet extends HttpServlet {
         Order newOrder = new Order(title, message, user);
         orderDB.addNewOrder(newOrder);
         response.sendRedirect("/repair-agency/list");
+    }
+
+    private void deleteOrder(HttpServletRequest request, HttpServletResponse response) throws SQLException, IOException, ServletException {
+        int id = Integer.parseInt(request.getParameter("id"));
+        boolean isDeleted = orderDB.deleteOrder(id);
+        String message;
+        if (isDeleted) {
+            message = "Order by id: " + id + " deleted!";
+        } else {
+            message = "Order by id: " + id + " not found!";
+        }
+        request.setAttribute("message", message);
+        RequestDispatcher dispatcher = request.getRequestDispatcher("/delete.jsp");
+        dispatcher.forward(request, response);
     }
 }

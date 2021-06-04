@@ -26,23 +26,21 @@
                     </c:if>
                 </h2>
             </caption>
-                <c:if test="${order != null}">
-                    <input type="hidden" name="id" value="<c:out value='${order.id}' />" />
-                </c:if>
+            <c:if test="${order != null}">
+                <input type="hidden" name="id" value="<c:out value='${order.id}' />" />
+            </c:if>
             <tr>
                 <th>Title: </th>
                 <td>
                     <input type="text" name="title" size="45"
-                            value="<c:out value='${order.title}' />"
-                        />
+                            value="<c:out value='${order.title}' />" required minlength="4" maxlength="30"/>
                 </td>
             </tr>
             <tr>
                 <th>Message: </th>
                 <td>
                     <input type="text" name="message" size="45"
-                            value="<c:out value='${order.message}' />"
-                    />
+                            value="<c:out value='${order.message}' />" required minlength="20" maxlength="100"/>
                 </td>
             </tr>
             <tr>

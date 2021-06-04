@@ -14,25 +14,26 @@
         <a href="/repair-agency/list/new">New Order</a>
         <br><br><br>
         <div align="center">
-                <table border="1" cellpadding="5">
-                    <caption><h2>List of Orders</h2></caption>
+            <table border="1" cellpadding="5">
+                <caption><h2>List of Orders</h2></caption>
+                <tr>
+                    <th>ID</th>
+                    <th>Title</th>
+                    <th>Actions</th>
+                </tr>
+                <c:forEach var="order" items="${listOrders}">
                     <tr>
-                        <th>ID</th>
-                        <th>Title</th>
-                        <th>Actions</th>
+                        <td><c:out value="${order.id}" /></td>
+                        <td><c:out value="${order.title}" /></td>
+                        <td>
+                            <a href="/edit?id=<c:out value='${order.id}' />">Edit</a>
+                            &nbsp;&nbsp;&nbsp;&nbsp;
+                            <a href="/repair-agency/list/delete?id=<c:out value='${order.id}' />">Delete</a>
+                        </td>
                     </tr>
-                    <c:forEach var="order" items="${listOrders}">
-                        <tr>
-                            <td><c:out value="${order.id}" /></td>
-                            <td><c:out value="${order.title}" /></td>
-                            <td>
-                                <a href="/edit?id=<c:out value='${order.id}' />">Edit</a>
-                                &nbsp;&nbsp;&nbsp;&nbsp;
-                                <a href="/delete?id=<c:out value='${order.id}' />">Delete</a>
-                            </td>
-                        </tr>
-                    </c:forEach>
-                </table>
-            </div>
+                </c:forEach>
+            </table>
+            <div><p>${message}</p></div>
+        </div>
     </body>
 </html>

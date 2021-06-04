@@ -13,15 +13,24 @@ public class Order {
     public Order() {
     }
 
+    public Order(int id, String title) {
+        this.id = id;
+        this.title = title;
+    }
+
     public Order(String title, String message, User user) {
         this.title = title;
         this.message = message;
         this.user = user;
     }
 
-    public Order(int id, String title) {
-        this.id = id;
+    public Order(String title, String message, User user, double price, String workerName, State state) {
         this.title = title;
+        this.message = message;
+        this.user = user;
+        this.price = price;
+        this.workerName = workerName;
+        this.state = state;
     }
 
     public int getId() {

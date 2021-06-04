@@ -10,7 +10,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 public class OrderDB {
 
@@ -20,8 +19,7 @@ public class OrderDB {
         this.connection = connection;
     }
 
-    public boolean addNewOrder(Order order) throws SQLException {
-        boolean isAdd = false;
+    public void addNewOrder(Order order) throws SQLException {
         String query = "INSERT INTO orders(title, message, user_id, state_id) VALUES(?,?,?, (SELECT id FROM states " +
                 "WHERE state_name=?))";
 
@@ -32,12 +30,10 @@ public class OrderDB {
             preparedStatement.setString(4, State.PROCESSING.toString().toLowerCase());
 
             preparedStatement.executeUpdate();
-            isAdd = true;
         } catch (SQLException e) {
             e.printStackTrace();
         }
         ConnectionDB.disconnect();
-        return isAdd;
     }
 
     public List<Order> listAllUserOrders(User user) throws SQLException {
@@ -61,5 +57,44 @@ public class OrderDB {
         }
         ConnectionDB.disconnect();
         return listOrders;
+    }
+
+    public Order getOrder(int id) {
+        String query = "SELECT title, message, " +
+                "(SELECT username FROM users INNER JOIN orders ON orders.worker_id=users.id where orders.id=?) FROM orders WHERE id=?";
+        Order order = null;
+
+        try(PreparedStatement preparedStatement = this.connection.prepareStatement(query)) {
+            preparedStatement.setInt(1, id);
+
+            try(ResultSet resultSet = preparedStatement.executeQuery()) {
+                if (resultSet.next()) {
+                    String title = resultSet.getString("title");
+                    String message = resultSet.getString("message");
+                    String username = resultSet.getString("username");
+                    double price = resultSet.getDouble("price");
+                    int workerId = resultSet.getInt("worker_id");
+                    int stateId = resultSet.getInt("state_id");
+
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public boolean deleteOrder(int idOrder) throws SQLException {
+        String query = "DELETE FROM orders WHERE id=?";
+        boolean rowDeleted = false;
+
+        try(PreparedStatement preparedStatement = this.connection.prepareStatement(query)) {
+            preparedStatement.setInt(1, idOrder);
+
+            rowDeleted = preparedStatement.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        ConnectionDB.disconnect();
+        return rowDeleted;
     }
 }
