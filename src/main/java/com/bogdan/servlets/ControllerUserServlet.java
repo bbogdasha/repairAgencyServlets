@@ -15,7 +15,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 
-@WebServlet({"/list", "/list/new", "/list/insert", "/list/delete"})
+@WebServlet({"/list", "/list/new", "/list/insert", "/list/delete", "/list/edit"})
 public class ControllerUserServlet extends HttpServlet {
 
     private OrderDB orderDB;
@@ -40,9 +40,9 @@ public class ControllerUserServlet extends HttpServlet {
                 case "/list/delete":
                     deleteOrder(request, response);
                     break;
-//                case "/edit":
-//                    showEditForm(request, response);
-//                    break;
+                case "/list/edit":
+                    showEditForm(request, response);
+                    break;
 //                case "/update":
 //                    updateBook(request, response);
 //                    break;
@@ -64,11 +64,17 @@ public class ControllerUserServlet extends HttpServlet {
     }
 
     private void showNewForm(HttpServletRequest request, HttpServletResponse response) throws SQLException, IOException, ServletException {
-        RequestDispatcher dispatcher = request.getRequestDispatcher("/newOrder.jsp");
+        RequestDispatcher dispatcher = request.getRequestDispatcher("/orderForm.jsp");
         dispatcher.forward(request, response);
     }
 
-
+    private void showEditForm(HttpServletRequest request, HttpServletResponse response) throws SQLException, IOException, ServletException {
+        int id = Integer.parseInt(request.getParameter("id"));
+        Order order = orderDB.getOrder(id);
+        RequestDispatcher dispatcher = request.getRequestDispatcher("/orderForm.jsp");
+        request.setAttribute("order", order);
+        dispatcher.forward(request, response);
+    }
 
     private void addOrder(HttpServletRequest request, HttpServletResponse response) throws SQLException, IOException {
         String title = request.getParameter("title");

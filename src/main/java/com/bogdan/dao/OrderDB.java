@@ -10,6 +10,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 public class OrderDB {
 
@@ -59,28 +60,41 @@ public class OrderDB {
         return listOrders;
     }
 
-    public Order getOrder(int id) {
-        String query = "SELECT title, message, " +
-                "(SELECT username FROM users INNER JOIN orders ON orders.worker_id=users.id where orders.id=?) FROM orders WHERE id=?";
+    public Order getOrder(int orderId) {
+        String query = "SELECT title, message, user_id, price, worker_id, " +
+                "(SELECT state_name FROM states INNER JOIN orders ON orders.state_id=states.id where orders.id=?) " +
+                "FROM orders WHERE id=?";
+
         Order order = null;
+        UserDB userDB = new UserDB(this.connection);
 
         try(PreparedStatement preparedStatement = this.connection.prepareStatement(query)) {
-            preparedStatement.setInt(1, id);
+            preparedStatement.setInt(1, orderId);
+            preparedStatement.setInt(2, orderId);
 
             try(ResultSet resultSet = preparedStatement.executeQuery()) {
                 if (resultSet.next()) {
                     String title = resultSet.getString("title");
                     String message = resultSet.getString("message");
-                    String username = resultSet.getString("username");
+                    int userId = resultSet.getInt("user_id");
                     double price = resultSet.getDouble("price");
                     int workerId = resultSet.getInt("worker_id");
-                    int stateId = resultSet.getInt("state_id");
+                    State state = State.valueOf(resultSet.getString("state_name").toUpperCase(Locale.ROOT));
 
+                    User user = userDB.getUserById(userId);
+                    User worker = userDB.getUserById(workerId);
+
+                    if (worker == null) {
+                        order = new Order(orderId, title, message, user, price, "-", state);
+                    } else {
+                        order = new Order(orderId, title, message, user, price, worker.getName(), state);
+                    }
                 }
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
+        return order;
     }
 
     public boolean deleteOrder(int idOrder) throws SQLException {

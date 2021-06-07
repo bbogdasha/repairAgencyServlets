@@ -26,7 +26,7 @@
                         <td><c:out value="${order.id}" /></td>
                         <td><c:out value="${order.title}" /></td>
                         <td>
-                            <a href="/edit?id=<c:out value='${order.id}' />">Edit</a>
+                            <a href="/repair-agency/list/edit?id=<c:out value='${order.id}' />">Edit</a>
                             &nbsp;&nbsp;&nbsp;&nbsp;
                             <a href="/repair-agency/list/delete?id=<c:out value='${order.id}' />">Delete</a>
                         </td>

@@ -43,6 +43,36 @@
                             value="<c:out value='${order.message}' />" required minlength="20" maxlength="100"/>
                 </td>
             </tr>
+            <c:if test="${order != null}">
+                <tr>
+                    <th>Customer: </th>
+                    <td>
+                        <input type="text" name="user" size="45"
+                                value="<c:out value='${order.user.getName()}' />" readonly/>
+                    </td>
+                </tr>
+                <tr>
+                    <th>Price: </th>
+                    <td>
+                        <input type="text" name="price" size="45"
+                                value="<c:out value='${order.price}' />" readonly/>
+                    </td>
+                </tr>
+                <tr>
+                    <th>Worker: </th>
+                    <td>
+                        <input type="text" name="worker" size="45"
+                                value="<c:out value='${order.workerName}' />" readonly/>
+                    </td>
+                </tr>
+                <tr>
+                    <th>Customer: </th>
+                    <td>
+                        <input type="text" name="state" size="45"
+                                value="<c:out value='${order.state}' />" readonly/>
+                    </td>
+                </tr>
+            </c:if>
             <tr>
                 <td colspan="2" align="center">
                     <input type="submit" value="Save" />

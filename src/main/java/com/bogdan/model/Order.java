@@ -24,7 +24,8 @@ public class Order {
         this.user = user;
     }
 
-    public Order(String title, String message, User user, double price, String workerName, State state) {
+    public Order(int id, String title, String message, User user, double price, String workerName, State state) {
+        this.id = id;
         this.title = title;
         this.message = message;
         this.user = user;
