@@ -60,9 +60,9 @@ public class OrderDB {
         return listOrders;
     }
 
-    public Order getOrder(int orderId) {
+    public Order getOrder(int orderId) throws SQLException {
         String query = "SELECT title, message, user_id, price, worker_id, " +
-                "(SELECT state_name FROM states INNER JOIN orders ON orders.state_id=states.id where orders.id=?) " +
+                "(SELECT state_name FROM states INNER JOIN orders ON orders.state_id=states.id WHERE orders.id=?) " +
                 "FROM orders WHERE id=?";
 
         Order order = null;
@@ -94,7 +94,31 @@ public class OrderDB {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+        ConnectionDB.disconnect();
         return order;
+    }
+
+    public boolean updateOrder(Order order) throws SQLException {
+        String query = "UPDATE orders SET title=?, message=?, price=?, " +
+                "worker_id=(SELECT id FROM users WHERE username=?), " +
+                "state_id=(SELECT id FROM states WHERE state_name=?) WHERE id=?";
+
+        boolean isUpdated = false;
+
+        try(PreparedStatement preparedStatement = this.connection.prepareStatement(query)) {
+            preparedStatement.setString(1, order.getTitle());
+            preparedStatement.setString(2, order.getMessage());
+            preparedStatement.setDouble(3, order.getPrice());
+            preparedStatement.setString(4, order.getWorkerName());
+            preparedStatement.setString(5, order.getState().toString().toLowerCase());
+            preparedStatement.setInt(6, order.getId());
+
+            isUpdated = preparedStatement.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        ConnectionDB.disconnect();
+        return isUpdated;
     }
 
     public boolean deleteOrder(int idOrder) throws SQLException {

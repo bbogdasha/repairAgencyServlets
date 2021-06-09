@@ -3,6 +3,7 @@ package com.bogdan.servlets;
 import com.bogdan.dao.ConnectionDB;
 import com.bogdan.dao.OrderDB;
 import com.bogdan.model.Order;
+import com.bogdan.model.State;
 import com.bogdan.model.User;
 
 import javax.servlet.RequestDispatcher;
@@ -15,8 +16,8 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 
-@WebServlet({"/list", "/list/new", "/list/insert", "/list/delete", "/list/edit"})
-public class ControllerUserServlet extends HttpServlet {
+@WebServlet({"/list", "/list/new", "/list/insert", "/list/delete", "/list/edit", "/list/update"})
+public class ControllerOrderServlet extends HttpServlet {
 
     private OrderDB orderDB;
 
@@ -27,7 +28,6 @@ public class ControllerUserServlet extends HttpServlet {
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String action = request.getServletPath();
-        System.out.println("Action: " + action);
         try {
             orderDB = new OrderDB(ConnectionDB.getConnection());
             switch (action) {
@@ -43,9 +43,9 @@ public class ControllerUserServlet extends HttpServlet {
                 case "/list/edit":
                     showEditForm(request, response);
                     break;
-//                case "/update":
-//                    updateBook(request, response);
-//                    break;
+                case "/list/update":
+                    updateOrder(request, response);
+                    break;
                 default:
                     listOrders(request, response);
                     break;
@@ -82,6 +82,19 @@ public class ControllerUserServlet extends HttpServlet {
         User user = (User) request.getSession().getAttribute("user");
         Order newOrder = new Order(title, message, user);
         orderDB.addNewOrder(newOrder);
+        response.sendRedirect("/repair-agency/list");
+    }
+
+    private void updateOrder(HttpServletRequest request, HttpServletResponse response) throws SQLException, IOException {
+        int id = Integer.parseInt(request.getParameter("id"));
+        String title = request.getParameter("title");
+        String message = request.getParameter("message");
+        double price = Double.parseDouble(request.getParameter("price"));
+        String worker = request.getParameter("worker");
+        State state = State.valueOf(request.getParameter("state"));
+
+        Order upOrder = new Order(id, title, message, price, worker, state);
+        orderDB.updateOrder(upOrder);
         response.sendRedirect("/repair-agency/list");
     }
 
