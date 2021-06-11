@@ -5,6 +5,7 @@ import com.bogdan.dao.UserDB;
 import com.bogdan.model.Role;
 import com.bogdan.model.User;
 
+import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -23,7 +24,6 @@ public class LoginServlet extends HttpServlet {
         String email = request.getParameter("email");
         String password = request.getParameter("password");
 
-        String path = request.getContextPath();
         String page = "/login.jsp";
 
         try {
@@ -43,7 +43,8 @@ public class LoginServlet extends HttpServlet {
                 String message = "Invalid email or password!";
                 request.setAttribute("message", message);
             }
-            response.sendRedirect(path + page);
+            RequestDispatcher dispatcher = request.getRequestDispatcher(page);
+            dispatcher.forward(request, response);
         } catch (SQLException e) {
             e.printStackTrace();
         }

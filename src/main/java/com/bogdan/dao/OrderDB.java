@@ -20,9 +20,11 @@ public class OrderDB {
         this.connection = connection;
     }
 
-    public void addNewOrder(Order order) throws SQLException {
+    public boolean addNewOrder(Order order) throws SQLException {
         String query = "INSERT INTO orders(title, message, user_id, state_id) VALUES(?,?,?, (SELECT id FROM states " +
                 "WHERE state_name=?))";
+
+        boolean addRow = false;
 
         try(PreparedStatement preparedStatement = this.connection.prepareStatement(query)) {
             preparedStatement.setString(1, order.getTitle());
@@ -30,16 +32,17 @@ public class OrderDB {
             preparedStatement.setInt(3, order.getUser().getId());
             preparedStatement.setString(4, State.PROCESSING.toString().toLowerCase());
 
-            preparedStatement.executeUpdate();
+            addRow = preparedStatement.executeUpdate() > 0;
         } catch (SQLException e) {
             e.printStackTrace();
         }
         ConnectionDB.disconnect();
+        return addRow;
     }
 
     public List<Order> listAllUserOrders(User user) throws SQLException {
         List<Order> listOrders = new ArrayList<>();
-        String query = "SELECT * FROM orders WHERE user_id=?";
+        String query = "SELECT * FROM orders WHERE user_id=? ORDER BY id";
 
         try(PreparedStatement preparedStatement = this.connection.prepareStatement(query)) {
             preparedStatement.setInt(1, user.getId());

@@ -76,26 +76,43 @@ public class ControllerOrderServlet extends HttpServlet {
         dispatcher.forward(request, response);
     }
 
-    private void addOrder(HttpServletRequest request, HttpServletResponse response) throws SQLException, IOException {
+    private void addOrder(HttpServletRequest request, HttpServletResponse response) throws SQLException, IOException, ServletException {
         String title = request.getParameter("title");
-        String message = request.getParameter("message");
+        String orderMessage = request.getParameter("message");
         User user = (User) request.getSession().getAttribute("user");
-        Order newOrder = new Order(title, message, user);
-        orderDB.addNewOrder(newOrder);
-        response.sendRedirect("/repair-agency/list");
+        Order newOrder = new Order(title, orderMessage, user);
+
+        boolean isCreate = orderDB.addNewOrder(newOrder);
+        String message;
+        if (isCreate) {
+            message = "Order successfully created!";
+        } else {
+            message = "Order was not created!";
+        }
+        request.setAttribute("message", message);
+        RequestDispatcher dispatcher = request.getRequestDispatcher("/list");
+        dispatcher.forward(request, response);
     }
 
-    private void updateOrder(HttpServletRequest request, HttpServletResponse response) throws SQLException, IOException {
+    private void updateOrder(HttpServletRequest request, HttpServletResponse response) throws SQLException, IOException, ServletException {
         int id = Integer.parseInt(request.getParameter("id"));
         String title = request.getParameter("title");
-        String message = request.getParameter("message");
+        String orderMessage = request.getParameter("message");
         double price = Double.parseDouble(request.getParameter("price"));
         String worker = request.getParameter("worker");
         State state = State.valueOf(request.getParameter("state"));
 
-        Order upOrder = new Order(id, title, message, price, worker, state);
-        orderDB.updateOrder(upOrder);
-        response.sendRedirect("/repair-agency/list");
+        Order upOrder = new Order(id, title, orderMessage, price, worker, state);
+        boolean isUpdated = orderDB.updateOrder(upOrder);
+        String message;
+        if (isUpdated) {
+            message = "Order by №: " + id + " updated!";
+        } else {
+            message = "Order by №: " + id + " not updated!";
+        }
+        request.setAttribute("message", message);
+        RequestDispatcher dispatcher = request.getRequestDispatcher("/list");
+        dispatcher.forward(request, response);
     }
 
     private void deleteOrder(HttpServletRequest request, HttpServletResponse response) throws SQLException, IOException, ServletException {
@@ -103,12 +120,12 @@ public class ControllerOrderServlet extends HttpServlet {
         boolean isDeleted = orderDB.deleteOrder(id);
         String message;
         if (isDeleted) {
-            message = "Order by id: " + id + " deleted!";
+            message = "Order by №: " + id + " deleted!";
         } else {
-            message = "Order by id: " + id + " not found!";
+            message = "Order by №: " + id + " not found!";
         }
         request.setAttribute("message", message);
-        RequestDispatcher dispatcher = request.getRequestDispatcher("/delete.jsp");
+        RequestDispatcher dispatcher = request.getRequestDispatcher("/list");
         dispatcher.forward(request, response);
     }
 }
