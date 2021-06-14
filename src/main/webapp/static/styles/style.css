@@ -147,3 +147,6 @@ h1, h3 {
 .form-save {
     width: 20% !important;
 }
+.field-read {
+    background-color: #e0e0e0;
+}

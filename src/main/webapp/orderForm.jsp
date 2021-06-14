@@ -1,14 +1,15 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<html>
     <head>
-        <title>New Order</title>
-        <link href="../static/styles/style.css" rel="stylesheet" type="text/css">
+        <title>Order form</title>
+        <link href="${pageContext.request.contextPath}/static/styles/style.css" rel="stylesheet" type="text/css">
     </head>
     <body>
         <div class="container">
             <div class="logo"><a href="../welcome.jsp">Repair Agency</a></div>
             <div class="content">
-                <h1>Create new order</h1>
+                <h1>Order form</h1>
                 <div class="form">
                     <c:if test="${order != null}">
                         <form action="update" method="post">
@@ -43,39 +44,48 @@
                                     <textarea name="message" size="45" class="message" required minlength="20" maxlength="100"><c:out value='${order.message}' /></textarea>
                                 </td>
                             </tr>
+
                             <c:if test="${order != null}">
                                 <tr>
                                     <th>Customer: </th>
                                     <td>
                                         <input type="text" name="user" size="45"
-                                                value="<c:out value='${order.user.getName()}' />" readonly/>
+                                                value="<c:out value='${order.user.getName()}' />" readonly class="field-read"/>
                                     </td>
                                 </tr>
                                 <tr>
                                     <th>Price: </th>
                                     <td>
                                         <input type="text" name="price" size="45"
-                                                value="<c:out value='${order.price}' />" readonly/>
+                                                value="<c:out value='${order.price}' />"
+                                                <c:if test="${session.getRole() == Role.USER}">readonly class="field-read"</c:if>/>
                                     </td>
                                 </tr>
                                 <tr>
                                     <th>Worker: </th>
                                     <td>
                                         <input type="text" name="worker" size="45"
-                                                value="<c:out value='${order.workerName}' />" readonly/>
+                                                value="<c:out value='${order.workerName}' />"
+                                                <c:if test="${session.getRole() == Role.USER}">readonly class="field-read"</c:if>/>
                                     </td>
                                 </tr>
                                 <tr>
                                     <th>Customer: </th>
                                     <td>
                                         <input type="text" name="state" size="45"
-                                                value="<c:out value='${order.state}' />" readonly/>
+                                                value="<c:out value='${order.state}' />"
+                                                <c:if test="${session.getRole() == Role.USER}">readonly class="field-read"</c:if>/>
                                     </td>
                                 </tr>
                             </c:if>
                             <tr>
                                 <td colspan="2" align="center">
-                                    <a href="../list" class="button form-back">Back</a>
+                                    <c:if test="${session.getRole() == Role.USER}">
+                                        <a href="../list" class="button form-back">Back</a>
+                                    </c:if>
+                                    <c:if test="${session.getRole() != Role.USER}">
+                                        <input type="button" value="Back" onClick="history.back()" class="button form-back">
+                                    </c:if>
                                     <input type="submit" value="Save" class="button form-save"/>
                                 </td>
                             </tr>

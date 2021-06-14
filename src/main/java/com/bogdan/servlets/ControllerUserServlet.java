@@ -17,7 +17,7 @@ import java.sql.SQLException;
 import java.util.List;
 
 @WebServlet({"/list", "/list/new", "/list/insert", "/list/delete", "/list/edit", "/list/update"})
-public class ControllerOrderServlet extends HttpServlet {
+public class ControllerUserServlet extends HttpServlet {
 
     private OrderDB orderDB;
 

@@ -41,8 +41,9 @@ public class OrderDB {
     }
 
     public List<Order> listAllUserOrders(User user) throws SQLException {
-        List<Order> listOrders = new ArrayList<>();
         String query = "SELECT * FROM orders WHERE user_id=? ORDER BY id";
+
+        List<Order> listOrders = new ArrayList<>();
 
         try(PreparedStatement preparedStatement = this.connection.prepareStatement(query)) {
             preparedStatement.setInt(1, user.getId());

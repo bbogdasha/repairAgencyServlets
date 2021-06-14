@@ -33,8 +33,9 @@ public class LoginServlet extends HttpServlet {
             if (user != null) {
                 HttpSession session = request.getSession();
 
-                if (user.getRole().equals(Role.MANAGER) && user.getRole().equals(Role.WORKER)) {
-                    page = "/manager.jsp";
+                if (user.getRole().equals(Role.MANAGER) || user.getRole().equals(Role.WORKER)) {
+                    session.setAttribute("user", user);
+                    page = "/manager";
                 } else {
                     session.setAttribute("user", user);
                     page = "/list";
