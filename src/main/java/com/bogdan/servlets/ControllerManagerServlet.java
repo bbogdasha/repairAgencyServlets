@@ -4,6 +4,7 @@ import com.bogdan.dao.ConnectionDB;
 import com.bogdan.dao.OrderDB;
 import com.bogdan.dao.UserDB;
 import com.bogdan.model.Order;
+import com.bogdan.model.Role;
 import com.bogdan.model.State;
 import com.bogdan.model.User;
 
@@ -17,7 +18,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 
-@WebServlet({"/manager", "/manager/user", "/manager/user/edit", "/manager/user/update"})
+@WebServlet({"/manager", "/manager/user", "/manager/user/edit", "/manager/user/update", "/manager/user/delete", "/manager/delete"})
 public class ControllerManagerServlet extends HttpServlet {
 
     private UserDB userDB;
@@ -43,6 +44,12 @@ public class ControllerManagerServlet extends HttpServlet {
                 case "/manager/user/update":
                     updateUsersOrder(request, response);
                     break;
+                case "/manager/user/delete":
+                    deleteUsersOrder(request, response);
+                    break;
+                case "/manager/delete":
+                    deleteUser(request, response);
+                    break;
                 default:
                     listUsers(request, response);
                     break;
@@ -53,18 +60,22 @@ public class ControllerManagerServlet extends HttpServlet {
     }
 
     private void listUsers(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException, SQLException {
+        User user = (User) request.getSession().getAttribute("user");
         List<User> listUsers = userDB.getListUsers();
         request.setAttribute("listUsers", listUsers);
+        request.setAttribute("session", user);
         RequestDispatcher dispatcher = request.getRequestDispatcher("/manager.jsp");
         dispatcher.forward(request, response);
     }
 
     private void showUsersOrders(HttpServletRequest request, HttpServletResponse response) throws SQLException, ServletException, IOException {
+        User session = (User) request.getSession().getAttribute("user");
         int id = Integer.parseInt(request.getParameter("id"));
         User user = userDB.getUserById(id);
         List<Order> listOrders = orderDB.listAllUserOrders(user);
         request.setAttribute("listOrders", listOrders);
         request.setAttribute("user", user);
+        request.setAttribute("session", session);
         RequestDispatcher dispatcher = request.getRequestDispatcher("/userOrders.jsp");
         dispatcher.forward(request, response);
     }
@@ -73,9 +84,12 @@ public class ControllerManagerServlet extends HttpServlet {
         User user = (User) request.getSession().getAttribute("user");
         int id = Integer.parseInt(request.getParameter("id"));
         Order order = orderDB.getOrder(id);
-        RequestDispatcher dispatcher = request.getRequestDispatcher("/orderForm.jsp");
+        List<User> workers = userDB.getUsersByRole(Role.WORKER);
+        request.setAttribute("states", State.values());
+        request.setAttribute("workers", workers);
         request.setAttribute("order", order);
         request.setAttribute("session", user);
+        RequestDispatcher dispatcher = request.getRequestDispatcher("/orderForm.jsp");
         dispatcher.forward(request, response);
     }
 
@@ -83,6 +97,7 @@ public class ControllerManagerServlet extends HttpServlet {
         int id = Integer.parseInt(request.getParameter("id"));
         String title = request.getParameter("title");
         String orderMessage = request.getParameter("message");
+        String user = request.getParameter("user");
         double price = Double.parseDouble(request.getParameter("price"));
         String worker = request.getParameter("worker");
         State state = State.valueOf(request.getParameter("state"));
@@ -91,9 +106,37 @@ public class ControllerManagerServlet extends HttpServlet {
         boolean isUpdated = orderDB.updateOrder(upOrder);
         String message;
         if (isUpdated) {
-            message = "Order by №: " + id + " updated!";
+            message = "Customer " + user + " ,order by ID: " + id + " updated!";
         } else {
-            message = "Order by №: " + id + " not updated!";
+            message = "Customer " + user + " ,order by ID: " + id + " not updated!";
+        }
+        request.setAttribute("message", message);
+        RequestDispatcher dispatcher = request.getRequestDispatcher("/manager");
+        dispatcher.forward(request, response);
+    }
+
+    private void deleteUsersOrder(HttpServletRequest request, HttpServletResponse response) throws SQLException, IOException, ServletException {
+        int id = Integer.parseInt(request.getParameter("id"));
+        boolean isDeleted = orderDB.deleteOrder(id);
+        String message;
+        if (isDeleted) {
+            message = "Order by ID: " + id + " deleted!";
+        } else {
+            message = "Order by ID: " + id + " not found!";
+        }
+        request.setAttribute("message", message);
+        RequestDispatcher dispatcher = request.getRequestDispatcher("/manager");
+        dispatcher.forward(request, response);
+    }
+
+    private void deleteUser(HttpServletRequest request, HttpServletResponse response) throws SQLException, IOException, ServletException {
+        int id = Integer.parseInt(request.getParameter("id"));
+        boolean isDeleted = userDB.deleteUser(id);
+        String message;
+        if (isDeleted) {
+            message = "User by ID: " + id + " deleted!";
+        } else {
+            message = "User by ID: " + id + " not found!";
         }
         request.setAttribute("message", message);
         RequestDispatcher dispatcher = request.getRequestDispatcher("/manager");

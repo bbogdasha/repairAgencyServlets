@@ -148,6 +148,34 @@ public class UserDB {
         return users;
     }
 
+    public List<User> getUsersByRole(Role nameRole) throws SQLException {
+        String query = "SELECT users.id, username, email, pass, role_id FROM users INNER JOIN roles ON roles.id=users.role_id WHERE roles.role_name=?";
+
+        List<User> workers = new ArrayList<>();
+        User user = null;
+
+        try(PreparedStatement preparedStatement = this.connection.prepareStatement(query)) {
+            preparedStatement.setString(1, nameRole.name().toLowerCase());
+
+            try(ResultSet resultSet = preparedStatement.executeQuery()) {
+                while (resultSet.next()) {
+                    int id = resultSet.getInt("id");
+                    String name = resultSet.getString("username");
+                    String email = resultSet.getString("email");
+                    String password = resultSet.getString("pass");
+                    int role_id = resultSet.getInt("role_id");
+                    Role role = getRole(role_id);
+
+                    user = new User(id, role, name, email, password);
+                    workers.add(user);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return workers;
+    }
+
     public Role getRole(int roleId) throws SQLException {
         String query = "SELECT role_name FROM roles WHERE id=?";
 
@@ -166,5 +194,20 @@ public class UserDB {
             e.printStackTrace();
         }
         return role_name;
+    }
+
+    public boolean deleteUser(int idUser) throws SQLException {
+        String query = "DELETE FROM users WHERE id=?;";
+        boolean rowDeleted = false;
+
+        try(PreparedStatement preparedStatement = this.connection.prepareStatement(query)) {
+            preparedStatement.setInt(1, idUser);
+
+            rowDeleted = preparedStatement.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        ConnectionDB.disconnect();
+        return rowDeleted;
     }
 }

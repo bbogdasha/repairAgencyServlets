@@ -7,6 +7,7 @@ import com.bogdan.model.User;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -23,16 +24,23 @@ public class RegisterServlet extends HttpServlet {
         String email = request.getParameter("email");
         String password = request.getParameter("password");
 
+        String page = "/login.jsp";
+        String message;
+
         User user = new User(Role.USER, uname, email, password);
 
         try {
             UserDB userDB = new UserDB(ConnectionDB.getConnection());
 
             if (userDB.saveUser(user)) {
-                response.getWriter().print("Data entered successfully");
+                message = "You have successfully registered!";
             } else {
-                response.getWriter().print("Data not entered");
+                message = "Registration failed!";
+                page = "/registration.jsp";
             }
+            request.setAttribute("message", message);
+            RequestDispatcher dispatcher = request.getRequestDispatcher(page);
+            dispatcher.forward(request, response);
         } catch (SQLException throwable) {
             throwable.printStackTrace();
         }

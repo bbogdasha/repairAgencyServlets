@@ -98,7 +98,6 @@ public class OrderDB {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        ConnectionDB.disconnect();
         return order;
     }
 

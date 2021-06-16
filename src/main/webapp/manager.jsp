@@ -20,11 +20,11 @@
                         <caption><h2>List of Users</h2></caption>
                         <tr>
                             <th width="8%">№</th>
-                            <th width="15%">User ID</th>
-                            <th width="20%">name</th>
+                            <th width="12%">User ID</th>
+                            <th width="18%">Name</th>
                             <th>Email</th>
-                            <th>Role</th>
-                            <th width="20%">Action</th>
+                            <th width="18%">Role</th>
+                            <th width="18%">Action</th>
                         </tr>
                         <c:forEach var="user" items="${listUsers}" varStatus="status">
                             <tr>
@@ -35,6 +35,9 @@
                                 <td><c:out value="${user.role}" /></td>
                                 <td align="center">
                                     <a href="/repair-agency/manager/user?id=<c:out value='${user.id}' />" class="button action">Show orders</a>
+                                    <c:if test="${session.getRole() == 'MANAGER'}">
+                                        <br><br><a href="/repair-agency/manager/delete?id=<c:out value='${user.id}' />" class="button action">Delete user</a>
+                                    </c:if>
                                 </td>
                             </tr>
                         </c:forEach>

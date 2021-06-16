@@ -18,8 +18,8 @@
                     <table border="1" cellpadding="5">
                         <caption><h2>List of Orders</h2></caption>
                         <tr>
-                            <th width="8%">ID</th>
-                            <th width="15%">Order №</th>
+                            <th width="8%">№</th>
+                            <th width="15%">Order ID</th>
                             <th>Title</th>
                             <th width="20%">Actions</th>
                         </tr>
@@ -30,7 +30,9 @@
                                 <td><c:out value="${order.title}" /></td>
                                 <td align="center">
                                     <a href="/repair-agency/manager/user/edit?id=<c:out value='${order.id}' />" class="button action">Edit</a>
-                                    <a href="/repair-agency/manager/user/delete?id=<c:out value='${order.id}' />" class="button action">Delete</a>
+                                    <c:if test="${session.getRole() == 'MANAGER'}">
+                                        <a href="/repair-agency/manager/user/delete?id=<c:out value='${order.id}' />" class="button action">Delete</a>
+                                    </c:if>
                                 </td>
                             </tr>
                         </c:forEach>

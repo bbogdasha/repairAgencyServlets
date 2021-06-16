@@ -106,9 +106,9 @@ public class ControllerUserServlet extends HttpServlet {
         boolean isUpdated = orderDB.updateOrder(upOrder);
         String message;
         if (isUpdated) {
-            message = "Order by №: " + id + " updated!";
+            message = "Order by ID: " + id + " updated!";
         } else {
-            message = "Order by №: " + id + " not updated!";
+            message = "Order by ID: " + id + " not updated!";
         }
         request.setAttribute("message", message);
         RequestDispatcher dispatcher = request.getRequestDispatcher("/list");
@@ -120,9 +120,9 @@ public class ControllerUserServlet extends HttpServlet {
         boolean isDeleted = orderDB.deleteOrder(id);
         String message;
         if (isDeleted) {
-            message = "Order by №: " + id + " deleted!";
+            message = "Order by ID: " + id + " deleted!";
         } else {
-            message = "Order by №: " + id + " not found!";
+            message = "Order by ID: " + id + " not found!";
         }
         request.setAttribute("message", message);
         RequestDispatcher dispatcher = request.getRequestDispatcher("/list");

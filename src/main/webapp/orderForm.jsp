@@ -7,7 +7,10 @@
     </head>
     <body>
         <div class="container">
-            <div class="logo"><a href="../welcome.jsp">Repair Agency</a></div>
+            <div class="logo">
+                <c:if test="${session.getRole() == Role.USER}"><a href="../welcome.jsp">Repair Agency</a></c:if>
+                <c:if test="${session.getRole() != Role.USER}"><a href="../../welcome.jsp">Repair Agency</a></c:if>
+            </div>
             <div class="content">
                 <h1>Order form</h1>
                 <div class="form">
@@ -41,7 +44,7 @@
                             <tr>
                                 <th>Message: </th>
                                 <td>
-                                    <textarea name="message" size="45" class="message" required minlength="20" maxlength="100"><c:out value='${order.message}' /></textarea>
+                                    <textarea name="message" size="45" class="message" required minlength="10" maxlength="100"><c:out value='${order.message}' /></textarea>
                                 </td>
                             </tr>
 
@@ -58,32 +61,42 @@
                                     <td>
                                         <input type="text" name="price" size="45"
                                                 value="<c:out value='${order.price}' />"
-                                                <c:if test="${session.getRole() == Role.USER}">readonly class="field-read"</c:if>/>
+                                                <c:if test="${session.getRole() != 'MANAGER'}">readonly class="field-read"</c:if>/>
                                     </td>
                                 </tr>
                                 <tr>
                                     <th>Worker: </th>
                                     <td>
-                                        <input type="text" name="worker" size="45"
-                                                value="<c:out value='${order.workerName}' />"
-                                                <c:if test="${session.getRole() == Role.USER}">readonly class="field-read"</c:if>/>
+                                        <select name="worker" <c:if test="${session.getRole() != 'MANAGER'}">readonly class="field-read"</c:if>/>>
+                                            <option value="${order.workerName}" selected>${order.workerName}</option>
+                                            <c:forEach var="item" items="${workers}">
+                                                <c:if test="${item.name != order.getWorkerName()}">
+                                                    <option value="${item.name}">${item.getName()}</option>
+                                                </c:if>
+                                            </c:forEach>
+                                        </select>
                                     </td>
                                 </tr>
                                 <tr>
-                                    <th>Customer: </th>
+                                    <th>Status: </th>
                                     <td>
-                                        <input type="text" name="state" size="45"
-                                                value="<c:out value='${order.state}' />"
-                                                <c:if test="${session.getRole() == Role.USER}">readonly class="field-read"</c:if>/>
+                                        <select name="state" <c:if test="${session.getRole() == Role.USER}">readonly class="field-read"</c:if>/>>
+                                            <option value="${order.state}" selected>${order.state}</option>
+                                            <c:forEach var="item" items="${states}">
+                                                <c:if test="${item != order.getState()}">
+                                                    <option value="${item}">${item.name()}</option>
+                                                </c:if>
+                                            </c:forEach>
+                                        </select>
                                     </td>
                                 </tr>
                             </c:if>
                             <tr>
                                 <td colspan="2" align="center">
-                                    <c:if test="${session.getRole() == Role.USER}">
+                                    <c:if test="${session.getRole() == 'USER'}">
                                         <a href="../list" class="button form-back">Back</a>
                                     </c:if>
-                                    <c:if test="${session.getRole() != Role.USER}">
+                                    <c:if test="${session.getRole() != 'USER'}">
                                         <input type="button" value="Back" onClick="history.back()" class="button form-back">
                                     </c:if>
                                     <input type="submit" value="Save" class="button form-save"/>

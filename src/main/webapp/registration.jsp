@@ -18,6 +18,7 @@
                             <tr><td></td><td><input type="submit" value="Registration" class="button"></td></tr>
                         </table>
                     </form>
+                    <p>${message}</p>
                 </div>
                 Already have an account? <a href="login.jsp">Login</a>
             </div>
