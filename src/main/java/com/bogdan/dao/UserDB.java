@@ -92,15 +92,12 @@ public class UserDB {
     }
 
     public User getUserById(int userId) throws SQLException {
-        String query = "SELECT id, username, email, pass, " +
-                "(SELECT role_name FROM roles INNER JOIN users ON users.role_id=roles.id WHERE users.id=?) " +
-                "FROM users WHERE id=?";
+        String query = "SELECT id, username, email, pass, role_id FROM users WHERE id=?";
 
         User user = null;
 
         try(PreparedStatement preparedStatement = this.connection.prepareStatement(query)) {
             preparedStatement.setInt(1, userId);
-            preparedStatement.setInt(2, userId);
 
             try(ResultSet resultSet = preparedStatement.executeQuery()) {
                 while (resultSet.next()) {
@@ -108,7 +105,34 @@ public class UserDB {
                     String name = resultSet.getString("username");
                     String email = resultSet.getString("email");
                     String password = resultSet.getString("pass");
-                    Role role = Role.valueOf(resultSet.getString("role_name").toUpperCase(Locale.ROOT));
+                    int role_id = resultSet.getInt("role_id");
+                    Role role = getRole(role_id);
+
+                    user = new User(id, role, name, email, password);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return user;
+    }
+
+    public User getUserByEmail(String userEmail) throws SQLException {
+        String query = "SELECT id, username, email, pass, role_id FROM users WHERE email=?";
+
+        User user = null;
+
+        try(PreparedStatement preparedStatement = this.connection.prepareStatement(query)) {
+            preparedStatement.setString(1, userEmail);
+
+            try(ResultSet resultSet = preparedStatement.executeQuery()) {
+                while (resultSet.next()) {
+                    int id = resultSet.getInt("id");
+                    String name = resultSet.getString("username");
+                    String email = resultSet.getString("email");
+                    String password = resultSet.getString("pass");
+                    int role_id = resultSet.getInt("role_id");
+                    Role role = getRole(role_id);
 
                     user = new User(id, role, name, email, password);
                 }
@@ -120,24 +144,23 @@ public class UserDB {
     }
 
     public List<User> getUsersByName(String username) throws SQLException {
-        String query = "SELECT username, email, pass, " +
-                "(SELECT role_name FROM roles INNER JOIN users ON users.role_id=roles.id WHERE users.username=?) " +
-                "FROM users WHERE username=?";
+        String query = "SELECT id, username, email, pass, role_id FROM users WHERE username=?";
 
         List<User> users = new ArrayList<>();
 
         try(PreparedStatement preparedStatement = this.connection.prepareStatement(query)) {
             preparedStatement.setString(1, username);
-            preparedStatement.setString(2, username);
 
             try(ResultSet resultSet = preparedStatement.executeQuery()) {
                 while (resultSet.next()) {
+                    int id = resultSet.getInt("id");
                     String name = resultSet.getString("username");
                     String email = resultSet.getString("email");
                     String password = resultSet.getString("pass");
-                    Role role = Role.valueOf(resultSet.getString("role_name").toUpperCase(Locale.ROOT));
+                    int role_id = resultSet.getInt("role_id");
+                    Role role = getRole(role_id);
 
-                    User user = new User(role, name, email, password);
+                    User user = new User(id, role, name, email, password);
                     users.add(user);
                 }
             }

@@ -64,6 +64,7 @@ public class ControllerManagerServlet extends HttpServlet {
         List<User> listUsers = userDB.getListUsers();
         request.setAttribute("listUsers", listUsers);
         request.setAttribute("session", user);
+        request.setAttribute("roles", Role.values());
         RequestDispatcher dispatcher = request.getRequestDispatcher("/manager.jsp");
         dispatcher.forward(request, response);
     }

@@ -131,6 +131,9 @@ h1, h3 {
 .list p {
     color: blue;
 }
+.filter {
+    margin-top: 40px;
+}
 
 
 /*---Form new / update order---*/
