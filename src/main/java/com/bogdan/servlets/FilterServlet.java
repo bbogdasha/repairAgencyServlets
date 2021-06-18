@@ -2,7 +2,6 @@ package com.bogdan.servlets;
 
 
 import com.bogdan.dao.ConnectionDB;
-import com.bogdan.dao.OrderDB;
 import com.bogdan.dao.UserDB;
 import com.bogdan.model.Role;
 import com.bogdan.model.User;
@@ -22,7 +21,6 @@ import java.util.List;
 public class FilterServlet extends HttpServlet {
 
     private UserDB userDB;
-    private OrderDB orderDB;
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -33,11 +31,8 @@ public class FilterServlet extends HttpServlet {
         String action = request.getServletPath();
         try {
             userDB = new UserDB(ConnectionDB.getConnection());
-            orderDB = new OrderDB(ConnectionDB.getConnection());
-            switch (action) {
-                case "/manager/filter":
-                    filterUsers(request, response);
-                    break;
+            if ("/manager/filter".equals(action)) {
+                filterUsers(request, response);
             }
         } catch (SQLException ex) {
             throw new ServletException(ex);

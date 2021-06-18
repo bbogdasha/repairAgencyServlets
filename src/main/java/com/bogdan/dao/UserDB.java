@@ -38,8 +38,8 @@ public class UserDB {
     }
 
     public User logUser(String email, String pass) throws SQLException {
-        String query = "SELECT users.id, username, email, pass, role_name FROM users INNER JOIN roles ON roles.id=users.role_id " +
-                "WHERE email=? AND pass=?";
+        String query = "SELECT users.id, username, email, pass, role_name FROM users " +
+                "INNER JOIN roles ON roles.id=users.role_id WHERE email=? AND pass=?";
 
         User user = null;
 
@@ -172,7 +172,8 @@ public class UserDB {
     }
 
     public List<User> getUsersByRole(Role nameRole) throws SQLException {
-        String query = "SELECT users.id, username, email, pass, role_id FROM users INNER JOIN roles ON roles.id=users.role_id WHERE roles.role_name=?";
+        String query = "SELECT users.id, username, email, pass, role_id FROM users " +
+                "INNER JOIN roles ON roles.id=users.role_id WHERE roles.role_name=?";
 
         List<User> workers = new ArrayList<>();
         User user = null;
