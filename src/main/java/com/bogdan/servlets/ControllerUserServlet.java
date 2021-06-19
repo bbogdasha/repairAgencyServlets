@@ -1,7 +1,7 @@
 package com.bogdan.servlets;
 
-import com.bogdan.dao.ConnectionDB;
-import com.bogdan.dao.OrderDB;
+import com.bogdan.dao.ConnectionFactory;
+import com.bogdan.dao.OrderDBImpl;
 import com.bogdan.model.Order;
 import com.bogdan.model.State;
 import com.bogdan.model.User;
@@ -16,10 +16,10 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 
-@WebServlet({"/list", "/list/new", "/list/insert", "/list/delete", "/list/edit", "/list/update"})
+@WebServlet({"/list", "/list/new", "/list/insert", "/list/delete", "/list/edit", "/list/update", "/list/view"})
 public class ControllerUserServlet extends HttpServlet {
 
-    private OrderDB orderDB;
+    private OrderDBImpl orderDBImpl;
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -29,8 +29,11 @@ public class ControllerUserServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String action = request.getServletPath();
         try {
-            orderDB = new OrderDB(ConnectionDB.getConnection());
+            orderDBImpl = new OrderDBImpl(ConnectionFactory.getInstance().getConnection());
             switch (action) {
+                case "/list/view":
+                    viewOrder(request, response);
+                    break;
                 case "/list/new":
                     showNewForm(request, response);
                     break;
@@ -57,9 +60,19 @@ public class ControllerUserServlet extends HttpServlet {
 
     private void listOrders(HttpServletRequest request, HttpServletResponse response) throws SQLException, IOException, ServletException {
         User user = (User) request.getSession().getAttribute("user");
-        List<Order> listOrders = orderDB.listAllUserOrders(user);
+        List<Order> listOrders = orderDBImpl.listAllUserOrders(user);
         request.setAttribute("listOrders", listOrders);
         RequestDispatcher dispatcher = request.getRequestDispatcher("/home.jsp");
+        dispatcher.forward(request, response);
+    }
+
+    private void viewOrder(HttpServletRequest request, HttpServletResponse response) throws SQLException, ServletException, IOException {
+        User session = (User) request.getSession().getAttribute("user");
+        int id = Integer.parseInt(request.getParameter("id"));
+        Order order = orderDBImpl.getOrder(id);
+        request.setAttribute("order", order);
+        request.setAttribute("session", session);
+        RequestDispatcher dispatcher = request.getRequestDispatcher("/order.jsp");
         dispatcher.forward(request, response);
     }
 
@@ -70,9 +83,9 @@ public class ControllerUserServlet extends HttpServlet {
 
     private void showEditForm(HttpServletRequest request, HttpServletResponse response) throws SQLException, IOException, ServletException {
         int id = Integer.parseInt(request.getParameter("id"));
-        Order order = orderDB.getOrder(id);
-        RequestDispatcher dispatcher = request.getRequestDispatcher("/orderForm.jsp");
+        Order order = orderDBImpl.getOrder(id);
         request.setAttribute("order", order);
+        RequestDispatcher dispatcher = request.getRequestDispatcher("/orderForm.jsp");
         dispatcher.forward(request, response);
     }
 
@@ -82,7 +95,7 @@ public class ControllerUserServlet extends HttpServlet {
         User user = (User) request.getSession().getAttribute("user");
         Order newOrder = new Order(title, orderMessage, user);
 
-        boolean isCreate = orderDB.addNewOrder(newOrder);
+        boolean isCreate = orderDBImpl.addNewOrder(newOrder);
         String message;
         if (isCreate) {
             message = "Order successfully created!";
@@ -103,7 +116,7 @@ public class ControllerUserServlet extends HttpServlet {
         State state = State.valueOf(request.getParameter("state"));
 
         Order upOrder = new Order(id, title, orderMessage, price, worker, state);
-        boolean isUpdated = orderDB.updateOrder(upOrder);
+        boolean isUpdated = orderDBImpl.updateOrder(upOrder);
         String message;
         if (isUpdated) {
             message = "Order by ID: " + id + " updated!";
@@ -117,7 +130,7 @@ public class ControllerUserServlet extends HttpServlet {
 
     private void deleteOrder(HttpServletRequest request, HttpServletResponse response) throws SQLException, IOException, ServletException {
         int id = Integer.parseInt(request.getParameter("id"));
-        boolean isDeleted = orderDB.deleteOrder(id);
+        boolean isDeleted = orderDBImpl.deleteOrder(id);
         String message;
         if (isDeleted) {
             message = "Order by ID: " + id + " deleted!";

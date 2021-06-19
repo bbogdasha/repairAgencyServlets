@@ -18,17 +18,22 @@
                     <table border="1" cellpadding="5">
                         <caption><h2>List of Orders</h2></caption>
                         <tr>
-                            <th width="8%">№</th>
-                            <th width="15%">Order ID</th>
+                            <th max-width="8%">№</th>
+                            <th max-width="13%">Order ID</th>
                             <th>Title</th>
-                            <th width="20%">Actions</th>
+                            <th max-width="13%">Price</th>
+                            <th max-width="19%">State</th>
+                            <th width="25%">Actions</th>
                         </tr>
                         <c:forEach var="order" items="${listOrders}" varStatus="status">
                             <tr>
                                 <td><c:out value="${status.count}" /></td>
                                 <td><c:out value="${order.id}" /></td>
                                 <td><c:out value="${order.title}" /></td>
+                                <td><c:out value="${order.price}" /></td>
+                                <td><c:out value="${order.state}" /></td>
                                 <td align="center">
+                                    <a href="/repair-agency/manager/user/view?id=<c:out value='${order.id}' />" class="button action">View</a>
                                     <a href="/repair-agency/manager/user/edit?id=<c:out value='${order.id}' />" class="button action">Edit</a>
                                     <c:if test="${session.getRole() == 'MANAGER'}">
                                         <a href="/repair-agency/manager/user/delete?id=<c:out value='${order.id}' />" class="button action">Delete</a>

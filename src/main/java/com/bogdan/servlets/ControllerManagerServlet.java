@@ -1,8 +1,8 @@
 package com.bogdan.servlets;
 
-import com.bogdan.dao.ConnectionDB;
-import com.bogdan.dao.OrderDB;
-import com.bogdan.dao.UserDB;
+import com.bogdan.dao.ConnectionFactory;
+import com.bogdan.dao.OrderDBImpl;
+import com.bogdan.dao.UserDBImpl;
 import com.bogdan.model.Order;
 import com.bogdan.model.Role;
 import com.bogdan.model.State;
@@ -18,11 +18,12 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 
-@WebServlet({"/manager", "/manager/user", "/manager/user/edit", "/manager/user/update", "/manager/user/delete", "/manager/delete"})
+@WebServlet({"/manager", "/manager/user", "/manager/user/view", "/manager/user/edit",
+        "/manager/user/update", "/manager/user/delete", "/manager/delete"})
 public class ControllerManagerServlet extends HttpServlet {
 
-    private UserDB userDB;
-    private OrderDB orderDB;
+    private UserDBImpl userDBImpl;
+    private OrderDBImpl orderDBImpl;
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -32,11 +33,14 @@ public class ControllerManagerServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String action = request.getServletPath();
         try {
-            userDB = new UserDB(ConnectionDB.getConnection());
-            orderDB = new OrderDB(ConnectionDB.getConnection());
+            userDBImpl = new UserDBImpl(ConnectionFactory.getInstance().getConnection());
+            orderDBImpl = new OrderDBImpl(ConnectionFactory.getInstance().getConnection());
             switch (action) {
                 case "/manager/user":
                     showUsersOrders(request, response);
+                    break;
+                case "/manager/user/view":
+                    viewUserOrder(request, response);
                     break;
                 case "/manager/user/edit":
                     showEditFormUsersOrder(request, response);
@@ -61,7 +65,7 @@ public class ControllerManagerServlet extends HttpServlet {
 
     private void listUsers(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException, SQLException {
         User user = (User) request.getSession().getAttribute("user");
-        List<User> listUsers = userDB.getListUsers();
+        List<User> listUsers = userDBImpl.getListUsers();
         request.setAttribute("listUsers", listUsers);
         request.setAttribute("session", user);
         request.setAttribute("roles", Role.values());
@@ -69,11 +73,21 @@ public class ControllerManagerServlet extends HttpServlet {
         dispatcher.forward(request, response);
     }
 
+    private void viewUserOrder(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException, SQLException {
+        User session = (User) request.getSession().getAttribute("user");
+        int id = Integer.parseInt(request.getParameter("id"));
+        Order order = orderDBImpl.getOrder(id);
+        request.setAttribute("order", order);
+        request.setAttribute("session", session);
+        RequestDispatcher dispatcher = request.getRequestDispatcher("/order.jsp");
+        dispatcher.forward(request, response);
+    }
+
     private void showUsersOrders(HttpServletRequest request, HttpServletResponse response) throws SQLException, ServletException, IOException {
         User session = (User) request.getSession().getAttribute("user");
         int id = Integer.parseInt(request.getParameter("id"));
-        User user = userDB.getUserById(id);
-        List<Order> listOrders = orderDB.listAllUserOrders(user);
+        User user = userDBImpl.getUserById(id);
+        List<Order> listOrders = orderDBImpl.listAllUserOrders(user);
         request.setAttribute("listOrders", listOrders);
         request.setAttribute("user", user);
         request.setAttribute("session", session);
@@ -84,8 +98,8 @@ public class ControllerManagerServlet extends HttpServlet {
     private void showEditFormUsersOrder(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException, SQLException {
         User user = (User) request.getSession().getAttribute("user");
         int id = Integer.parseInt(request.getParameter("id"));
-        Order order = orderDB.getOrder(id);
-        List<User> workers = userDB.getUsersByRole(Role.WORKER);
+        Order order = orderDBImpl.getOrder(id);
+        List<User> workers = userDBImpl.getUsersByRole(Role.WORKER);
         request.setAttribute("states", State.values());
         request.setAttribute("workers", workers);
         request.setAttribute("order", order);
@@ -104,7 +118,7 @@ public class ControllerManagerServlet extends HttpServlet {
         State state = State.valueOf(request.getParameter("state"));
 
         Order upOrder = new Order(id, title, orderMessage, price, worker, state);
-        boolean isUpdated = orderDB.updateOrder(upOrder);
+        boolean isUpdated = orderDBImpl.updateOrder(upOrder);
         String message;
         if (isUpdated) {
             message = "Customer " + user + " ,order by ID: " + id + " updated!";
@@ -118,7 +132,7 @@ public class ControllerManagerServlet extends HttpServlet {
 
     private void deleteUsersOrder(HttpServletRequest request, HttpServletResponse response) throws SQLException, IOException, ServletException {
         int id = Integer.parseInt(request.getParameter("id"));
-        boolean isDeleted = orderDB.deleteOrder(id);
+        boolean isDeleted = orderDBImpl.deleteOrder(id);
         String message;
         if (isDeleted) {
             message = "Order by ID: " + id + " deleted!";
@@ -132,7 +146,7 @@ public class ControllerManagerServlet extends HttpServlet {
 
     private void deleteUser(HttpServletRequest request, HttpServletResponse response) throws SQLException, IOException, ServletException {
         int id = Integer.parseInt(request.getParameter("id"));
-        boolean isDeleted = userDB.deleteUser(id);
+        boolean isDeleted = userDBImpl.deleteUser(id);
         String message;
         if (isDeleted) {
             message = "User by ID: " + id + " deleted!";

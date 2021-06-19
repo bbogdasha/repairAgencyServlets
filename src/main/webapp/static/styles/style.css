@@ -136,6 +136,19 @@ h1, h3 {
 }
 
 
+/*---View order---*/
+.order-table {
+    width: 100%;
+    margin-top: 30px;
+}
+.order-table th {
+    width: 20%;
+}
+.order-table-message p {
+    min-height: 100px;
+}
+
+
 /*---Form new / update order---*/
 .message {
     min-width: 100%;

@@ -1,8 +1,8 @@
 package com.bogdan.servlets;
 
 
-import com.bogdan.dao.ConnectionDB;
-import com.bogdan.dao.UserDB;
+import com.bogdan.dao.ConnectionFactory;
+import com.bogdan.dao.UserDBImpl;
 import com.bogdan.model.Role;
 import com.bogdan.model.User;
 
@@ -20,7 +20,7 @@ import java.util.List;
 @WebServlet("/manager/filter")
 public class FilterServlet extends HttpServlet {
 
-    private UserDB userDB;
+    private UserDBImpl userDBImpl;
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -30,7 +30,7 @@ public class FilterServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String action = request.getServletPath();
         try {
-            userDB = new UserDB(ConnectionDB.getConnection());
+            userDBImpl = new UserDBImpl(ConnectionFactory.getInstance().getConnection());
             if ("/manager/filter".equals(action)) {
                 filterUsers(request, response);
             }
@@ -47,18 +47,18 @@ public class FilterServlet extends HttpServlet {
         if (filterText != null && !filterText.isEmpty()) {
             switch (filterType) {
                 case "byUsername":
-                    listUsers = userDB.getUsersByName(filterText);
+                    listUsers = userDBImpl.getUsersByName(filterText);
                     break;
                 case "byUserEmail":
-                    User user = userDB.getUserByEmail(filterText);
+                    User user = userDBImpl.getUserByEmail(filterText);
                     listUsers.add(user);
                     break;
                 case "byRole":
-                    listUsers = userDB.getUsersByRole(Role.valueOf(filterText));
+                    listUsers = userDBImpl.getUsersByRole(Role.valueOf(filterText));
                     break;
             }
         } else {
-            listUsers = userDB.getListUsers();
+            listUsers = userDBImpl.getListUsers();
             request.setAttribute("listUsers", listUsers);
         }
         if (listUsers.isEmpty()) {

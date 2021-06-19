@@ -20,17 +20,22 @@
                     <table border="1" cellpadding="5">
                         <caption><h2>List of Orders</h2></caption>
                         <tr>
-                            <th width="8%">ID</th>
-                            <th width="15%">Order №</th>
+                            <th max-width="8%">№</th>
+                            <th max-width="13%">Order ID</th>
                             <th>Title</th>
-                            <th width="20%">Actions</th>
+                            <th max-width="13%"><a href="/repair-agency/list?price=true />">Price</a></th>
+                            <th max-width="19%">State</th>
+                            <th width="25%">Actions</th>
                         </tr>
                         <c:forEach var="order" items="${listOrders}" varStatus="status">
                             <tr>
                                 <td><c:out value="${status.count}" /></td>
                                 <td><c:out value="${order.id}" /></td>
                                 <td><c:out value="${order.title}" /></td>
+                                <td><c:out value="${order.price}" /></td>
+                                <td><c:out value="${order.state}" /></td>
                                 <td align="center">
+                                    <a href="/repair-agency/list/view?id=<c:out value='${order.id}' />" class="button action">View</a>
                                     <a href="/repair-agency/list/edit?id=<c:out value='${order.id}' />" class="button action">Edit</a>
                                     <a href="/repair-agency/list/delete?id=<c:out value='${order.id}' />" class="button action">Delete</a>
                                 </td>

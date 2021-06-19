@@ -1,7 +1,7 @@
 package com.bogdan.servlets;
 
-import com.bogdan.dao.ConnectionDB;
-import com.bogdan.dao.UserDB;
+import com.bogdan.dao.ConnectionFactory;
+import com.bogdan.dao.UserDBImpl;
 import com.bogdan.model.Role;
 import com.bogdan.model.User;
 
@@ -27,8 +27,8 @@ public class LoginServlet extends HttpServlet {
         String page = "/login.jsp";
 
         try {
-            UserDB userDB = new UserDB(ConnectionDB.getConnection());
-            User user = userDB.logUser(email, password);
+            UserDBImpl userDBImpl = new UserDBImpl(ConnectionFactory.getInstance().getConnection());
+            User user = userDBImpl.logUser(email, password);
 
             if (user != null) {
                 HttpSession session = request.getSession();

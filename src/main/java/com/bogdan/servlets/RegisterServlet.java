@@ -1,7 +1,7 @@
 package com.bogdan.servlets;
 
-import com.bogdan.dao.ConnectionDB;
-import com.bogdan.dao.UserDB;
+import com.bogdan.dao.ConnectionFactory;
+import com.bogdan.dao.UserDBImpl;
 import com.bogdan.model.Role;
 import com.bogdan.model.User;
 
@@ -30,9 +30,9 @@ public class RegisterServlet extends HttpServlet {
         User user = new User(Role.USER, uname, email, password);
 
         try {
-            UserDB userDB = new UserDB(ConnectionDB.getConnection());
+            UserDBImpl userDBImpl = new UserDBImpl(ConnectionFactory.getInstance().getConnection());
 
-            if (userDB.saveUser(user)) {
+            if (userDBImpl.saveUser(user)) {
                 message = "You have successfully registered!";
             } else {
                 message = "Registration failed!";
