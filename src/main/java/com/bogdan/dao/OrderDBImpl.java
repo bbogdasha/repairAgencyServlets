@@ -3,11 +3,11 @@ package com.bogdan.dao;
 import com.bogdan.model.Order;
 import com.bogdan.model.State;
 import com.bogdan.model.User;
+import com.bogdan.utils.ConnectionFactory;
+import com.bogdan.utils.Sorting;
+import com.bogdan.utils.SortingType;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -21,7 +21,7 @@ public class OrderDBImpl implements OrderDB {
     }
 
     public boolean addNewOrder(Order order) throws SQLException {
-        String query = "INSERT INTO orders(title, message, user_id, state_id) VALUES(?,?,?, (SELECT id FROM states " +
+        String query = "INSERT INTO orders(title, message, user_id, price, state_id) VALUES(?,?,?, 0.0, (SELECT id FROM states " +
                 "WHERE state_name=?))";
 
         boolean addRow = false;
@@ -40,31 +40,37 @@ public class OrderDBImpl implements OrderDB {
         return addRow;
     }
 
-    public List<Order> listAllUserOrders(User user) throws SQLException {
-        String query = "SELECT * FROM orders WHERE user_id=? ORDER BY id";
+    public List<Order> sortedListOrders(User user, Sorting sorting, SortingType sortingType) throws SQLException {
+        StringBuilder queryBuilder = new StringBuilder();
+        queryBuilder.append("SELECT * FROM orders WHERE user_id=").append(user.getId());
 
-        List<Order> listOrders = new ArrayList<>();
+        if (!Sorting.DEFAULT.equals(sorting)) {
+            queryBuilder.append("ORDER BY ").append(sortingType.getValue()).append(" ").append(sorting.getType());
+        } else {
+            queryBuilder.append("ORDER BY id");
+        }
 
-        try(PreparedStatement preparedStatement = this.connection.prepareStatement(query)) {
-            preparedStatement.setInt(1, user.getId());
+        List<Order> list = new ArrayList<>();
+        Order order = null;
 
-            try(ResultSet resultSet = preparedStatement.executeQuery()) {
-                while (resultSet.next()) {
-                    int id = resultSet.getInt("id");
-                    String title = resultSet.getString("title");
-                    double price = resultSet.getDouble("price");
-                    int state_id = resultSet.getInt("state_id");
-                    State state = getState(state_id);
+        try(Statement statement = this.connection.createStatement()) {
+            ResultSet resultSet = statement.executeQuery(queryBuilder.toString());
+            while (resultSet.next()) {
+                int id = resultSet.getInt("id");
+                String title = resultSet.getString("title");
+                double price = resultSet.getDouble("price");
+                int state_id = resultSet.getInt("state_id");
+                State state = getState(state_id);
 
-                    Order order = new Order(id, title, price, state);
-                    listOrders.add(order);
-                }
+                order = new Order(id, title, price, state);
+                list.add(order);
             }
+            resultSet.close();
         } catch (SQLException e) {
             e.printStackTrace();
         }
         ConnectionFactory.disconnect();
-        return listOrders;
+        return list;
     }
 
     public Order getOrder(int orderId) throws SQLException {

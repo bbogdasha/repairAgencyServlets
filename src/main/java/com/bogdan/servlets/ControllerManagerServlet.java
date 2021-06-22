@@ -1,12 +1,14 @@
 package com.bogdan.servlets;
 
-import com.bogdan.dao.ConnectionFactory;
+import com.bogdan.utils.ConnectionFactory;
 import com.bogdan.dao.OrderDBImpl;
 import com.bogdan.dao.UserDBImpl;
 import com.bogdan.model.Order;
 import com.bogdan.model.Role;
 import com.bogdan.model.State;
 import com.bogdan.model.User;
+import com.bogdan.utils.Sorting;
+import com.bogdan.utils.SortingType;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -24,6 +26,12 @@ public class ControllerManagerServlet extends HttpServlet {
 
     private UserDBImpl userDBImpl;
     private OrderDBImpl orderDBImpl;
+
+    private Sorting sortedPriceColumn = Sorting.ASC;
+    private Sorting sortedNameColumn = Sorting.ASC;
+    private Sorting sortedIdColumn = Sorting.ASC;
+    private Sorting activeSortingWay = Sorting.ASC;
+    private SortingType activeSortingType = SortingType.NAME;
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -87,10 +95,46 @@ public class ControllerManagerServlet extends HttpServlet {
         User session = (User) request.getSession().getAttribute("user");
         int id = Integer.parseInt(request.getParameter("id"));
         User user = userDBImpl.getUserById(id);
-        List<Order> listOrders = orderDBImpl.listAllUserOrders(user);
-        request.setAttribute("listOrders", listOrders);
+
+        if (request.getParameter("desc") != null) {
+            activeSortingWay = Sorting.DESC;
+        } else if (request.getParameter("asc") != null) {
+            activeSortingWay = Sorting.ASC;
+        } else {
+            activeSortingWay = Sorting.DEFAULT;
+        }
+
+        String sortParam = request.getParameter(activeSortingWay.getType().toLowerCase());
+        if (sortParam != null) {
+            activeSortingType = SortingType.safeValueOf(sortParam);
+            if (SortingType.NAME.equals(activeSortingType)) {
+                if (sortedNameColumn.equals(activeSortingWay)) {
+                    sortedNameColumn = Sorting.reverse(sortedNameColumn);
+                }
+            } else if (SortingType.PRICE.equals(activeSortingType)) {
+                if (sortedPriceColumn.equals(activeSortingWay)) {
+                    sortedPriceColumn = Sorting.reverse(sortedPriceColumn);
+                }
+            } else if (SortingType.ID.equals(activeSortingType)) {
+                if (sortedIdColumn.equals(activeSortingWay)) {
+                    sortedIdColumn = Sorting.reverse(sortedIdColumn);
+                }
+            }
+        }
+
+        List<Order> sortedList = orderDBImpl.sortedListOrders(user, activeSortingWay, activeSortingType);
+
+        request.setAttribute("activeSortingWay", activeSortingWay.getType().toLowerCase());
+        request.setAttribute("activeSortingType", activeSortingType.getValue());
+
+        request.setAttribute("sortedNameColumn", sortedNameColumn.getType().toLowerCase());
+        request.setAttribute("sortedPriceColumn", sortedPriceColumn.getType().toLowerCase());
+        request.setAttribute("sortedIdColumn", sortedIdColumn.getType().toLowerCase());
+
+        request.setAttribute("listOrders", sortedList);
         request.setAttribute("user", user);
         request.setAttribute("session", session);
+
         RequestDispatcher dispatcher = request.getRequestDispatcher("/userOrders.jsp");
         dispatcher.forward(request, response);
     }

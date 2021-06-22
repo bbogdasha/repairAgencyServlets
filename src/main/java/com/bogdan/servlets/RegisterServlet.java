@@ -1,6 +1,6 @@
 package com.bogdan.servlets;
 
-import com.bogdan.dao.ConnectionFactory;
+import com.bogdan.utils.ConnectionFactory;
 import com.bogdan.dao.UserDBImpl;
 import com.bogdan.model.Role;
 import com.bogdan.model.User;

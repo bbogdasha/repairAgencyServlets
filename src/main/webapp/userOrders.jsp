@@ -19,9 +19,9 @@
                         <caption><h2>List of Orders</h2></caption>
                         <tr>
                             <th max-width="8%">№</th>
-                            <th max-width="13%">Order ID</th>
-                            <th>Title</th>
-                            <th max-width="13%">Price</th>
+                            <th max-width="13%"><a href="/repair-agency/manager/user?id=${user.id}&${sortedIdColumn}=id">Order ID</a></th>
+                            <th width="25%"><a href="/repair-agency/manager/user?id=${user.id}&${sortedNameColumn}=title">Title</a></th>
+                            <th max-width="13%"><a href="/repair-agency/manager/user?id=${user.id}&${sortedPriceColumn}=price">Price</a></th>
                             <th max-width="19%">State</th>
                             <th width="25%">Actions</th>
                         </tr>

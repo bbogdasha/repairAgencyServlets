@@ -2,6 +2,7 @@ package com.bogdan.dao;
 
 import com.bogdan.model.Role;
 import com.bogdan.model.User;
+import com.bogdan.utils.ConnectionFactory;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -126,7 +127,7 @@ public class UserDBImpl implements UserDB {
             preparedStatement.setString(1, userEmail);
 
             try(ResultSet resultSet = preparedStatement.executeQuery()) {
-                while (resultSet.next()) {
+                if (resultSet.next()) {
                     int id = resultSet.getInt("id");
                     String name = resultSet.getString("username");
                     String email = resultSet.getString("email");

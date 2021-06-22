@@ -1,7 +1,7 @@
 package com.bogdan.servlets;
 
 
-import com.bogdan.dao.ConnectionFactory;
+import com.bogdan.utils.ConnectionFactory;
 import com.bogdan.dao.UserDBImpl;
 import com.bogdan.model.Role;
 import com.bogdan.model.User;
@@ -51,7 +51,9 @@ public class FilterServlet extends HttpServlet {
                     break;
                 case "byUserEmail":
                     User user = userDBImpl.getUserByEmail(filterText);
-                    listUsers.add(user);
+                    if (user != null) {
+                        listUsers.add(user);
+                    }
                     break;
                 case "byRole":
                     listUsers = userDBImpl.getUsersByRole(Role.valueOf(filterText));
@@ -61,8 +63,8 @@ public class FilterServlet extends HttpServlet {
             listUsers = userDBImpl.getListUsers();
             request.setAttribute("listUsers", listUsers);
         }
-        if (listUsers.isEmpty()) {
-            request.setAttribute("message", "No one with this name was found:(");
+        if (listUsers.isEmpty() || listUsers.contains(null)) {
+            request.setAttribute("message", "No one with this name/email was found:(");
         }
         request.setAttribute("listUsers", listUsers);
         request.setAttribute("roles", Role.values());

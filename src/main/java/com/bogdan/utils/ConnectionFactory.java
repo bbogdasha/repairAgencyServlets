@@ -1,4 +1,4 @@
-package com.bogdan.dao;
+package com.bogdan.utils;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
