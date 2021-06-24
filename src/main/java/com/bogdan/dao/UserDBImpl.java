@@ -23,16 +23,17 @@ public class UserDBImpl implements UserDB {
 
         boolean isSet = false;
 
-        try(PreparedStatement preparedStatement = this.connection.prepareStatement(query)) {
-            preparedStatement.setString(1, user.getName());
-            preparedStatement.setString(2, user.getEmail());
-            preparedStatement.setString(3, user.getPassword());
-            preparedStatement.setString(4, user.getRole().name().toLowerCase(Locale.ROOT));
+        if (getUserByEmail(user.getEmail()) == null) {
+            try(PreparedStatement preparedStatement = this.connection.prepareStatement(query)) {
+                preparedStatement.setString(1, user.getName());
+                preparedStatement.setString(2, user.getEmail());
+                preparedStatement.setString(3, user.getPassword());
+                preparedStatement.setString(4, user.getRole().name().toLowerCase(Locale.ROOT));
 
-            preparedStatement.executeUpdate();
-            isSet = true;
-        } catch (Exception e) {
-            e.printStackTrace();
+                isSet = preparedStatement.executeUpdate() > 0;
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
         ConnectionFactory.disconnect();
         return isSet;
